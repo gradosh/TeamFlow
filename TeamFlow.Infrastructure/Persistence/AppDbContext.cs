@@ -6,6 +6,7 @@ namespace TeamFlow.Infrastructure.Persistence;
 public class AppDbContext : DbContext
 {
     public DbSet<User> Users => Set<User>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options) { }
@@ -16,6 +17,11 @@ public class AppDbContext : DbContext
         {
             entity.HasKey(x => x.Id);
             entity.HasIndex(x => x.Email).IsUnique();
+        });
+        builder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => x.Token).IsUnique();
         });
     }
 }

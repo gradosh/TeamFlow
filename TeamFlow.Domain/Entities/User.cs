@@ -7,6 +7,7 @@ public class User
     public string PasswordHash { get; private set; } = null!;
     public string Role { get; private set; } = "User";
     public DateTime CreatedAt { get; private set; }
+    public ICollection<RefreshToken> RefreshTokens { get; private set; } = new List<RefreshToken>();
 
     private User() { }
 
