@@ -1,3 +1,4 @@
+using FluentValidation;
 using MediatR;
 using TeamFlow.Application.Common.Interfaces;
 using TeamFlow.Domain.Entities;
@@ -17,7 +18,9 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Guid>
     {
         var existing = await _userRepository.GetByEmailAsync(request.Email);
         if (existing != null)
-            throw new Exception("User already exists");
+            throw new ValidationException([
+    new FluentValidation.Results.ValidationFailure("Email", "User already exists")
+]);
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 

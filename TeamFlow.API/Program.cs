@@ -1,6 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using TeamFlow.API.Middleware;
 using TeamFlow.Application;
 using TeamFlow.Application.Common.Behaviors;
 using TeamFlow.Application.Common.Interfaces;
@@ -27,6 +28,8 @@ builder.Services.AddTransient(
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
