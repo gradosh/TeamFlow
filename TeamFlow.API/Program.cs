@@ -11,6 +11,7 @@ using TeamFlow.Application.Common.Interfaces;
 using TeamFlow.Infrastructure.Auth;
 using TeamFlow.Infrastructure.Persistence;
 using TeamFlow.Infrastructure.Repositories;
+using TeamFlow.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +55,13 @@ builder.Services.AddAuthentication("Bearer")
         };
     });
 builder.Services.AddAuthorization();
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "localhost:6379";
+    options.InstanceName = "teamflow_";
+});
+builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
 var app = builder.Build();
 

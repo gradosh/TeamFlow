@@ -8,15 +8,18 @@ public class UpdateTaskStatusCommandHandler
     private readonly ITaskRepository _taskRepo;
     private readonly IProjectRepository _projectRepo;
     private readonly ICurrentUserService _currentUser;
+    private readonly ICacheService _cache;
 
     public UpdateTaskStatusCommandHandler(
         ITaskRepository taskRepo,
         IProjectRepository projectRepo,
-        ICurrentUserService currentUser)
+        ICurrentUserService currentUser,
+         ICacheService cache)
     {
         _taskRepo = taskRepo;
         _projectRepo = projectRepo;
         _currentUser = currentUser;
+        _cache = cache;
     }
 
     public async Task Handle(
@@ -35,5 +38,6 @@ public class UpdateTaskStatusCommandHandler
         task.UpdateStatus(request.Status);
 
         await _taskRepo.SaveChangesAsync(cancellationToken);
+        await _cache.RemoveAsync($"board:{_currentUser.UserId}:{project.Id}");
     }
 }

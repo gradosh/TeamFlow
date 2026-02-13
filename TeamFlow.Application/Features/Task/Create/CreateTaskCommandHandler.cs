@@ -8,15 +8,18 @@ public class CreateTaskCommandHandler
     private readonly ITaskRepository _taskRepo;
     private readonly IProjectRepository _projectRepo;
     private readonly ICurrentUserService _currentUser;
+    private readonly ICacheService _cache;
 
     public CreateTaskCommandHandler(
         ITaskRepository taskRepo,
         IProjectRepository projectRepo,
-        ICurrentUserService currentUser)
+        ICurrentUserService currentUser,
+        ICacheService cache)
     {
         _taskRepo = taskRepo;
         _projectRepo = projectRepo;
         _currentUser = currentUser;
+        _cache  = cache;
     }
 
     public async Task<Guid> Handle(
@@ -36,7 +39,7 @@ public class CreateTaskCommandHandler
 
         await _taskRepo.AddAsync(task, cancellationToken);
         await _taskRepo.SaveChangesAsync(cancellationToken);
-
+        await _cache.RemoveAsync($"board:{_currentUser.UserId}:{request.ProjectId}");
         return task.Id;
     }
 }
