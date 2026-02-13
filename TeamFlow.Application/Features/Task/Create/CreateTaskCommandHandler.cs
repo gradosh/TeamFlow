@@ -39,7 +39,9 @@ public class CreateTaskCommandHandler
 
         await _taskRepo.AddAsync(task, cancellationToken);
         await _taskRepo.SaveChangesAsync(cancellationToken);
+
         await _cache.RemoveAsync($"board:{_currentUser.UserId}:{request.ProjectId}");
+        
         return task.Id;
     }
 }

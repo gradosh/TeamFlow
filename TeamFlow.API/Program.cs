@@ -63,6 +63,10 @@ builder.Services.AddStackExchangeRedisCache(options =>
 });
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
+builder.Services.AddTransient(
+    typeof(IPipelineBehavior<,>),
+    typeof(CachingBehavior<,>));
+
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

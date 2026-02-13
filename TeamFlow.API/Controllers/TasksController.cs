@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,5 +27,9 @@ public class TasksController : ControllerBase
 
     [HttpGet("board/{projectId}")]
     public async Task<IActionResult> GetBoard(Guid projectId)
-        => Ok(await _mediator.Send(new GetBoardQuery(projectId)));
+    {
+        var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return Ok(await _mediator.Send(
+            new GetBoardQuery(projectId, Guid.Parse(userId!))));
+    }
 }

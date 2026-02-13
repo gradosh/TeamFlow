@@ -38,6 +38,7 @@ public class UpdateTaskStatusCommandHandler
         task.UpdateStatus(request.Status);
 
         await _taskRepo.SaveChangesAsync(cancellationToken);
+        
         await _cache.RemoveAsync($"board:{_currentUser.UserId}:{project.Id}");
     }
 }
