@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: teamflow_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: teamflow
+      POSTGRES_PASSWORD: teamflow
+      POSTGRES_DB: teamflowdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: TeamFlow.API/Dockerfile
+    container_name: teamflow_api
+    depends_on:
+      - postgres
+    environment:
+      ConnectionStrings__Default: Host=postgres;Port=5432;Database=teamflowdb;Username=teamflow;Password=teamflow
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "5000:8080"
+
+volumes:
+  postgres_data:
