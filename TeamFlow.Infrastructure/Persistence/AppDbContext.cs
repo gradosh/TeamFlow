@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TeamFlow.Application.Common.Events;
+using TeamFlow.Domain;
 using TeamFlow.Domain.Entities;
 
 namespace TeamFlow.Infrastructure.Persistence;
@@ -50,6 +51,7 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        builder.Ignore<DomainEvent>();
         builder.Entity<User>(entity =>
         {
             entity.HasKey(x => x.Id);
