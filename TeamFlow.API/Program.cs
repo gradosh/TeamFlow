@@ -8,6 +8,8 @@ using TeamFlow.API.Middleware;
 using TeamFlow.API.Services;
 using TeamFlow.Application.Common.Behaviors;
 using TeamFlow.Application.Common.Interfaces;
+using TeamFlow.Domain.Entities;
+using TeamFlow.Domain.Enums;
 using TeamFlow.Infrastructure.Auth;
 using TeamFlow.Infrastructure.Persistence;
 using TeamFlow.Infrastructure.Repositories;
@@ -54,7 +56,13 @@ builder.Services.AddAuthentication("Bearer")
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
         };
     });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(
+    options =>
+{
+    options.AddPolicy("AdminOnly",
+        policy => policy.RequireRole(UserRole.Admin.ToString()));
+}
+);
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
