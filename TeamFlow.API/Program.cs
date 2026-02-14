@@ -3,9 +3,9 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using TeamFlow.API.Mapping;
 using TeamFlow.API.Middleware;
 using TeamFlow.API.Services;
-using TeamFlow.Application;
 using TeamFlow.Application.Common.Behaviors;
 using TeamFlow.Application.Common.Interfaces;
 using TeamFlow.Infrastructure.Auth;
@@ -20,12 +20,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(TeamFlow.Application.Common.Interfaces.IUserRepository).Assembly));
+    cfg.RegisterServicesFromAssembly(typeof(IUserRepository).Assembly));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
-builder.Services.AddValidatorsFromAssembly(typeof(TeamFlow.Application.Common.Behaviors.ValidationBehavior<,>).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(ValidationBehavior<,>).Assembly);
 
 builder.Services.AddTransient(
     typeof(IPipelineBehavior<,>),
@@ -66,6 +66,11 @@ builder.Services.AddScoped<ICacheService, RedisCacheService>();
 builder.Services.AddTransient(
     typeof(IPipelineBehavior<,>),
     typeof(CachingBehavior<,>));
+  
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile(new MappingProfile());
+});
 
 var app = builder.Build();
 

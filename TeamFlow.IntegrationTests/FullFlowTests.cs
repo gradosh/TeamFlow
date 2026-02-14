@@ -1,7 +1,9 @@
 using FluentAssertions;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using TeamFlow.API.Contracts.Projects;
 using TeamFlow.Application.Features.Projects.Create;
+using TeamFlow.Contracts.Tasks;
 
 public class LoginResponse
 {
@@ -54,37 +56,30 @@ public class FullFlowTests : IClassFixture<PostgresFixture>
             new AuthenticationHeaderValue("Bearer", loginContent.AccessToken);
 
         // 3️⃣ Create Project
-        var projectResponse = await _client.PostAsJsonAsync(
-            "/api/projects", new
-            {
-                Name = "Test Project",
-                Description = "Integration Test"
-            });
-//new CreateProjectCommand("Test Project", "Integration Test")
-        projectResponse.IsSuccessStatusCode.Should().BeTrue();
+        var projectRequest = await _client.PostAsJsonAsync(
+            "/api/projects",new CreateProjectRequest("Test Project", "Test desc"));
+        projectRequest.IsSuccessStatusCode.Should().BeTrue();
 
-        var projectId = await projectResponse.Content
-            .ReadFromJsonAsync<Guid>();
+        var createProjectResponse = await projectRequest.Content
+            .ReadFromJsonAsync<CreateProjectResponse>();
 
         // 4️⃣ Create Task
-        var taskResponse = await _client.PostAsJsonAsync(
-            "/api/tasks",
-            new
-            {
-                projectId,
-                title = "Test Task",
-                description = "Task desc"
-            });
+        var taskRequest = await _client.PostAsJsonAsync(
+            "/api/tasks", 
+            new CreateTaskRequest(
+                createProjectResponse!.ProjectId, 
+                "Test Task", 
+                "Task desc"));
 
-        taskResponse.IsSuccessStatusCode.Should().BeTrue();
+        taskRequest.IsSuccessStatusCode.Should().BeTrue();
 
         // 5️⃣ Get Board
-        var boardResponse = await _client.GetAsync(
-            $"/api/tasks/board/{projectId}");
+        var boardRequest = await _client.GetAsync(
+            $"/api/tasks/board/{createProjectResponse?.ProjectId}");
 
-        boardResponse.IsSuccessStatusCode.Should().BeTrue();
+        boardRequest.IsSuccessStatusCode.Should().BeTrue();
 
-        var board = await boardResponse.Content
+        var board = await boardRequest.Content
             .ReadFromJsonAsync<BoardDto>();
 
         board.Should().NotBeNull();
