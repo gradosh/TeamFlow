@@ -1,8 +1,9 @@
 using TeamFlow.Domain.Enums;
+using TeamFlow.Domain.Events;
 
 namespace TeamFlow.Domain.Entities;
 
-public class TaskItem
+public class TaskItem  : BaseEntity
 {
     public Guid Id { get; private set; }
     public string Title { get; private set; } = null!;
@@ -24,8 +25,9 @@ public class TaskItem
         CreatedAt = DateTime.UtcNow;
     }
 
-    public void UpdateStatus(Enums.TaskStatus status)
+    public void UpdateStatus(Enums.TaskStatus status,Guid userId)
     {
         Status = status;
+        AddDomainEvent(new TaskStatusUpdatedEvent(ProjectId, userId));
     }
 }

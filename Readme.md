@@ -5,14 +5,19 @@ Backend API для управления проектами и задачами (
 
 ## Stack
 
-- .NET 10
-- ASP.NET Core Web API
+- .NET 10 (ASP.NET Core Web API)
+- Clean Architecture
+- CQRS + MediatR
+- FluentValidation (Pipeline)
+- AutoMapper
 - Entity Framework Core
 - PostgreSQL
 - Redis
-- MediatR (CQRS + Pipeline Behaviors)
-- JWT Authentication
+- JWT authentication
+- Role-based authorization
+- Domain Events
 - Docker / Docker Compose
+- Testcontainers (integration tests)
 
 ## Features
 
@@ -39,6 +44,12 @@ Clean Architecture:
 - TTL expiration
 - Automatic caching via MediatR pipeline
 - Explicit cache invalidation in commands
+
+## Implemented patterns:
+- CQRS
+- Pipeline behaviors
+- Event-driven cache invalidation
+- Role-based and resource-based authorization
 
 ## Run
 

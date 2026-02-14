@@ -35,7 +35,7 @@ public class UpdateTaskStatusCommandHandler
         if (project.OwnerId != _currentUser.UserId)
             throw new UnauthorizedException("Access denied");
 
-        task.UpdateStatus(request.Status);
+        task.UpdateStatus(request.Status, _currentUser.UserId);
 
         await _taskRepo.SaveChangesAsync(cancellationToken);
         

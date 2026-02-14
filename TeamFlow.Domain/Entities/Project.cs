@@ -1,6 +1,6 @@
 namespace TeamFlow.Domain.Entities;
 
-public class Project
+public class Project : BaseEntity
 {
     public Guid Id { get; private set; }
     public string Name { get; private set; } = null!;

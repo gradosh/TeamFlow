@@ -2,7 +2,7 @@ using TeamFlow.Domain.Enums;
 
 namespace TeamFlow.Domain.Entities;
 
-public class User
+public class User  : BaseEntity
 {
     public Guid Id { get; private set; }
     public string Email { get; private set; } = null!;
