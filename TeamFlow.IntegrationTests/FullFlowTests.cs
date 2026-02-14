@@ -1,4 +1,5 @@
 using FluentAssertions;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using TeamFlow.API.Contracts.Projects;
@@ -21,9 +22,25 @@ public class FullFlowTests : IClassFixture<PostgresFixture>
     }
 
     [Fact]
-    public async Task Full_Project_Task_Board_Flow_Should_Work()
+    public async Task Should_Return_400_When_Project_Name_Is_Empty()
     {
-        // 1️⃣ Register
+        var token = await RegisterAuthorizeAndReturnToken();
+        _client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
+        var response = await _client.PostAsJsonAsync(
+            "/api/projects",
+            new
+            {
+                Name = "",
+                Description = "Test"
+            });
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Should_Register_And_Authorize_Successfully()
+    {
         var registerResponse = await _client.PostAsJsonAsync(
             "/api/auth/register",
             new
@@ -34,7 +51,6 @@ public class FullFlowTests : IClassFixture<PostgresFixture>
 
         registerResponse.IsSuccessStatusCode.Should().BeTrue();
 
-        // 2️⃣ Login
         var loginResponse = await _client.PostAsJsonAsync(
             "/api/auth/login",
             new
@@ -51,29 +67,56 @@ public class FullFlowTests : IClassFixture<PostgresFixture>
         loginContent.Should().NotBeNull();
         loginContent!.AccessToken.Should().NotBeNullOrEmpty();
         loginContent!.RefreshToken.Should().NotBeNullOrEmpty();
+    }
+
+    private async Task<string> RegisterAuthorizeAndReturnToken()
+    {
+        await _client.PostAsJsonAsync(
+            "/api/auth/register",
+            new
+            {
+                email = "flow@test.com",
+                password = "Password123!"
+            });
+
+        var loginResponse = await _client.PostAsJsonAsync(
+            "/api/auth/login",
+            new
+            {
+                email = "flow@test.com",
+                password = "Password123!"
+            });
+
+        var loginContent = await loginResponse.Content
+            .ReadFromJsonAsync<LoginResponse>();
+
+        return loginContent!.AccessToken;
+    }
+
+    [Fact]
+    public async Task Full_Project_Task_Board_Flow_Should_Work()
+    {
+        var token = await RegisterAuthorizeAndReturnToken();
 
         _client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", loginContent.AccessToken);
+            new AuthenticationHeaderValue("Bearer", token);
 
-        // 3️⃣ Create Project
         var projectRequest = await _client.PostAsJsonAsync(
-            "/api/projects",new CreateProjectRequest("Test Project", "Test desc"));
+            "/api/projects", new CreateProjectRequest("Test Project", "Test desc"));
         projectRequest.IsSuccessStatusCode.Should().BeTrue();
 
         var createProjectResponse = await projectRequest.Content
             .ReadFromJsonAsync<CreateProjectResponse>();
 
-        // 4️⃣ Create Task
         var taskRequest = await _client.PostAsJsonAsync(
-            "/api/tasks", 
+            "/api/tasks",
             new CreateTaskRequest(
-                createProjectResponse!.ProjectId, 
-                "Test Task", 
+                createProjectResponse!.ProjectId,
+                "Test Task",
                 "Task desc"));
 
         taskRequest.IsSuccessStatusCode.Should().BeTrue();
 
-        // 5️⃣ Get Board
         var boardRequest = await _client.GetAsync(
             $"/api/tasks/board/{createProjectResponse?.ProjectId}");
 
