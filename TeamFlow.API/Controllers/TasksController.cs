@@ -15,7 +15,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateTaskCommand command)
+    public async Task<IActionResult> Create([FromBody] CreateTaskCommand command)
         => Ok(await _mediator.Send(command));
 
     [HttpPatch("status")]

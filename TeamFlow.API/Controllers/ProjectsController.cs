@@ -15,7 +15,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateProjectCommand command)
+    public async Task<IActionResult> Create([FromBody]CreateProjectCommand command)
     {
         var id = await _mediator.Send(command);
         return Ok(id);

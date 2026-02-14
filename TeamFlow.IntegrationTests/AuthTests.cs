@@ -8,7 +8,7 @@ public class AuthTests : IClassFixture<PostgresFixture>
     public AuthTests(PostgresFixture fixture)
     {
         var factory = new CustomWebApplicationFactory(
-            fixture.Container.GetConnectionString());
+            fixture.Postgres.GetConnectionString());
 
         _client = factory.CreateClient();
     }
